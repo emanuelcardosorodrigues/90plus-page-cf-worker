@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+  Canonical index.html for a Vite + React app served via Cloudflare Worker
+  assets binding. The ORDER of <head> blocks matters more than any single
+  optimization — preconnect → consent state → pending shim → GTM → tracker.
+
+  Replace GTM-XXXXXXX with your real Container ID. Replace __CSP_NONCE__ with a
+  per-request nonce if your Worker ships strict CSP (see
+  assets/worker-edge-cache-snippet.ts for nonce generation).
+-->
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Page Title</title>
+
+    <!-- ORDEM IMPORTANTE 1: preconnect block. See assets/preconnect-head.html -->
+    <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
+    <link rel="preconnect" href="https://www.facebook.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+
+    <!--
+      ORDEM IMPORTANTE 2: page slug + tracker config.
+      Set these BEFORE the pending-shim and the tracker so the tracker reads
+      them on boot.
+
+      With strict CSP, add nonce="__CSP_NONCE__" to every <script> below and
+      ensure the CSP header includes 'nonce-__CSP_NONCE__'.
+    -->
+    <script>
+      window.__pageSlug = 'your-page-slug';
+      window.__cfg = {
+        externalCheckoutHosts: ['pay.example.com'],
+        workerRedirectPrefix: '/r/',
+        consentBypass: false, // set to true only in B2B / implied-consent contexts
+        respectDNT: false,
+        debug: false,
+      };
+    </script>
+
+    <!-- ORDEM IMPORTANTE 3: pending-shim. See assets/pending-shim.html -->
+    <script>
+      window.__pending = window.__pending || [];
+      window.__pendingPush = function (payload) {
+        try { window.__pending.push(payload); } catch (e) {}
+      };
+    </script>
+
+    <!-- ORDEM IMPORTANTE 4: GTM container. Loaded inline so it executes BEFORE the React bundle. -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-XXXXXXX');
+    </script>
+
+    <!--
+      ORDEM IMPORTANTE 5: link to the tracker module. Absolute path obrigatório:
+      /assets/..., nunca ./assets/. Relative paths break on nested routes.
+    -->
+    <!-- <script defer src="/click-tracker-global.js"></script> -->
+    <!-- For Vite + React: prefer importing in main.tsx so Vite hashes and bundles it. -->
+  </head>
+  <body>
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe>
+    </noscript>
+
+    <div id="root"></div>
+
+    <!--
+      ORDEM IMPORTANTE 6: React bundle loads LAST. Pixel/GTM/tracker have
+      already booted by the time hydration starts.
+
+      Absolute path obrigatório: /src/main.tsx, nunca ./src/main.tsx.
+    -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

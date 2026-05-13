@@ -1,0 +1,26 @@
+<!--
+  Pre-hydration click queue (pending-shim).
+  ORDEM IMPORTANTE: paste this BEFORE the tracker script tag, ideally as the
+  first <script> in <head> (right after the preconnect block).
+
+  Spec:
+  - WHAT it queues: events generated before the tracker boots — typically clicks
+    that landed in the 200-2.000ms gap between HTML parse and JS hydration.
+  - HOW callers push: `window.__pendingPush({event:'click', ...})` from any
+    pre-hydration code, or just `window.__pending.push(payload)`.
+  - WHEN it drains: the tracker (assets/click-tracker-global.js) reads
+    `window.__pending` at boot and flushes it into `dataLayer` via setTimeout(0).
+  - DIFERENÇA from `dataLayer`: __pending is pre-GTM; dataLayer is post-GTM.
+    The tracker bridges the two.
+  - POSSIVEL QUEBRA: if the tracker NEVER boots (JS error in bundle, CSP
+    rejection, network failure), __pending stays full forever. Symptom in
+    production: `window.__pending.length > 0` after a few seconds. This is a
+    critical bug, not just a tracking gap — investigate the tracker load.
+-->
+<script>
+  window.__pending = window.__pending || [];
+  window.__pendingPush = function (payload) {
+    try { window.__pending.push(payload); }
+    catch (e) { /* never let tracking break the page */ }
+  };
+</script>

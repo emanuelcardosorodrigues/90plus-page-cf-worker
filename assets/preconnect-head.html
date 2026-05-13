@@ -1,0 +1,30 @@
+<!--
+  Preconnect / dns-prefetch block for Cloudflare Worker-served landing pages.
+  ORDEM IMPORTANTE: this block must appear in <head> BEFORE the GTM script tag.
+
+  Why: the browser kicks off DNS resolution as soon as it sees the <link> hints.
+  If GTM is parsed first, the connection to www.googletagmanager.com is already
+  pending, and the preconnect hints arrive too late to save any time.
+
+  Adjust the host list to match the tracking pixels actually used on the page.
+  Remove entries you don't ship (TikTok pixel, Clarity, etc.).
+-->
+
+<!-- Pixel + GTM domains: TCP + TLS handshake warm by the time the script loads -->
+<link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+<link rel="preconnect" href="https://www.facebook.com" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+
+<!-- Optional pixels — uncomment those in use -->
+<!-- <link rel="preconnect" href="https://analytics.tiktok.com" crossorigin> -->
+<!-- <link rel="preconnect" href="https://px.ads.linkedin.com" crossorigin> -->
+
+<!-- DNS-prefetch (cheaper than preconnect) for hosts hit later in the journey -->
+<link rel="dns-prefetch" href="https://scripts.clarity.ms">
+<link rel="dns-prefetch" href="https://r.clarity.ms">
+
+<!--
+  After this block: pending-shim.html, then GTM <script>, then the rest of <head>.
+  See assets/vite-index-template.html for the canonical ordering.
+-->

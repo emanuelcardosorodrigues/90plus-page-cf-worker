@@ -1,0 +1,41 @@
+# _headers — Cache-Control rules for static assets served by a Cloudflare Worker.
+#
+# Cloudflare Worker assets binding respects these rules when files are served
+# directly. If your Worker serves via `fetch(request)` manually (with custom
+# middleware), you must replicate the rules inline with `response.headers.set(...)`.
+#
+# Adjust paths to match your build output. Vite outputs hashed filenames into
+# /assets/*; if you change that with build.assetsDir, update the rule.
+
+# Hashed Vite/Webpack/Rollup assets: immutable (file content changes -> filename changes)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Common static asset folders
+/images/*
+  Cache-Control: public, max-age=2592000
+
+/fonts/*
+  Cache-Control: public, max-age=2592000
+
+# Favicon and root icons: long cache, but must revalidate (deploys may change them without renaming)
+/favicon.ico
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# HTML: short cache, must revalidate, allows quick rollbacks
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate
+
+# API endpoints: never cache by intermediaries
+/api/*
+  Cache-Control: no-store
+
+# Sitemaps and robots
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=3600

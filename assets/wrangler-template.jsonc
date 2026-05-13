@@ -1,0 +1,70 @@
+// wrangler.jsonc — minimal Worker template for a Vite+React or HTML landing page.
+//
+// JSONC (not TOML). Comments allowed; schema validation via $schema.
+// Replace placeholders before running `wrangler deploy`.
+//
+// Setup:
+//   1. Replace "your-worker-name" with your actual Worker name (kebab-case).
+//   2. If serving a Vite build, point assets.directory at "./dist".
+//      For HTML+JS, point at "./public" or wherever your index.html lives.
+//   3. Replace "yourdomain.com/*" with the real route, or remove `routes` to
+//      deploy on the *.workers.dev preview domain.
+//   4. Uncomment bindings (KV, D1, R2, Vectorize, Queues) you actually use.
+//   5. NEVER commit account_id. Use `wrangler whoami` and `wrangler config`
+//      or set CLOUDFLARE_ACCOUNT_ID as an env var in CI.
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "your-worker-name",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Static assets. The directory must exist at deploy time.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+
+  // Routes. Leave commented out during initial development to use the
+  // *.workers.dev preview domain. Uncomment when ready to bind a custom domain.
+  // "routes": [
+  //   { "pattern": "yourdomain.com/*", "zone_name": "yourdomain.com" }
+  // ],
+
+  // Observability — enables `wrangler tail` and the dashboard log stream.
+  "observability": {
+    "enabled": true
+  },
+
+  // ----- Bindings (uncomment as needed) -----
+
+  // "kv_namespaces": [
+  //   { "binding": "EXAMPLE_KV", "id": "<run wrangler kv namespace create>" }
+  // ],
+
+  // "d1_databases": [
+  //   { "binding": "EXAMPLE_DB", "database_name": "example", "database_id": "<id>" }
+  // ],
+
+  // "r2_buckets": [
+  //   { "binding": "EXAMPLE_R2", "bucket_name": "example" }
+  // ],
+
+  // "vectorize": [
+  //   { "binding": "EXAMPLE_VECTORIZE", "index_name": "example-index" }
+  // ],
+
+  // "queues": {
+  //   "producers": [
+  //     { "binding": "EXAMPLE_QUEUE", "queue": "example-queue" }
+  //   ]
+  // },
+
+  // ----- Vars (non-secret) -----
+  // Secrets go via `wrangler secret put <KEY>` and are NOT versioned here.
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}
