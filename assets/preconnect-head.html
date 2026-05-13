@@ -1,28 +1,44 @@
 <!--
   Preconnect / dns-prefetch block for Cloudflare Worker-served landing pages.
-  ORDEM IMPORTANTE: this block must appear in <head> BEFORE the GTM script tag.
 
+  ORDEM IMPORTANTE: this block must appear in <head> BEFORE the GTM script tag.
   Why: the browser kicks off DNS resolution as soon as it sees the <link> hints.
   If GTM is parsed first, the connection to www.googletagmanager.com is already
   pending, and the preconnect hints arrive too late to save any time.
 
-  Adjust the host list to match the tracking pixels actually used on the page.
-  Remove entries you don't ship (TikTok pixel, Clarity, etc.).
+  Categorias (ordem):
+    1. GTM / sGTM (Stape ou Worker proxy próprio).
+    2. Meta Pixel + CAPI (incluindo bucket S3 / Worker proxy se houver).
+    3. VTURB / ConverteAI (player de vídeo de venda) — quase universal em VSL.
+    4. Pixels secundários (TikTok, LinkedIn, etc.) — só os que o site usa.
+    5. dns-prefetch para Clarity e hosts terciários.
+
+  Remova as linhas que o site não usa. preconnect sobrando desperdiça
+  orçamento de conexões iniciais do navegador (recomendação: <= 4-6 preconnects).
 -->
 
-<!-- Pixel + GTM domains: TCP + TLS handshake warm by the time the script loads -->
+<!-- 1. GTM / Server-side GTM (Stape ou Worker proxy proprio). Descomente e troque o host. -->
+<!-- <link rel="preconnect" href="https://sgtm.yourdomain.com" crossorigin> -->
+
+<!-- 2. Meta Pixel + CAPI -->
 <link rel="preconnect" href="https://connect.facebook.net" crossorigin>
 <link rel="preconnect" href="https://www.facebook.com" crossorigin>
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-<link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+<!-- Se voce usa um bucket S3 / Worker proprio para automacao CAPI, adicione aqui: -->
+<!-- <link rel="preconnect" href="https://your-capi-host.example.com"> -->
 
-<!-- Optional pixels — uncomment those in use -->
+<!-- 3. VTURB / ConverteAI (player de video de venda) — incluir SEMPRE que a pagina tem VTURB embed -->
+<link rel="preconnect" href="https://cdn.converteai.net" crossorigin>
+
+<!-- 4. Pixels secundarios (descomente o que o site usa) -->
 <!-- <link rel="preconnect" href="https://analytics.tiktok.com" crossorigin> -->
 <!-- <link rel="preconnect" href="https://px.ads.linkedin.com" crossorigin> -->
 
-<!-- DNS-prefetch (cheaper than preconnect) for hosts hit later in the journey -->
+<!-- 5. DNS-prefetch (mais barato que preconnect) — Clarity e hosts terciarios -->
 <link rel="dns-prefetch" href="https://scripts.clarity.ms">
+<link rel="dns-prefetch" href="https://www.clarity.ms">
 <link rel="dns-prefetch" href="https://r.clarity.ms">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<link rel="dns-prefetch" href="https://www.google-analytics.com">
 
 <!--
   After this block: pending-shim.html, then GTM <script>, then the rest of <head>.

@@ -14,11 +14,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Your Page Title</title>
 
-    <!-- ORDEM IMPORTANTE 1: preconnect block. See assets/preconnect-head.html -->
+    <!--
+      ORDEM IMPORTANTE 1: preconnect block. See assets/preconnect-head.html for
+      the full categorized version (GTM/sGTM, Meta+CAPI, VTURB, secondary pixels,
+      dns-prefetch). Keep only what the page actually uses.
+    -->
+    <!-- 1. GTM / sGTM (descomente e ajuste se usar) -->
+    <!-- <link rel="preconnect" href="https://sgtm.yourdomain.com" crossorigin /> -->
+
+    <!-- 2. Meta Pixel + CAPI -->
     <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
     <link rel="preconnect" href="https://www.facebook.com" crossorigin />
+    <!-- <link rel="preconnect" href="https://your-capi-host.example.com" /> -->
+
+    <!-- 3. VTURB / ConverteAI (incluir SEMPRE que a pagina tem VTURB embed) -->
+    <link rel="preconnect" href="https://cdn.converteai.net" crossorigin />
+
+    <!-- 4. GTM container + GA (fallback se nao usa sGTM) -->
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+
+    <!-- 5. dns-prefetch para Clarity (analytics, prioridade baixa) -->
+    <link rel="dns-prefetch" href="https://scripts.clarity.ms" />
+    <link rel="dns-prefetch" href="https://www.clarity.ms" />
+    <link rel="dns-prefetch" href="https://r.clarity.ms" />
 
     <!--
       ORDEM IMPORTANTE 2: page slug + tracker config.
